@@ -1,12 +1,15 @@
 <script>
+import axios from 'axios'
+
 export default {
     methods: {
         locatorButtonPressed() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        console.log(position.coords.latitude);
-                        console.log(position.coords.longitude);
+                        this.getAdressForm(position.coords.latitude, position.coords.longitude)
+                        /* console.log(position.coords.latitude);
+                        console.log(position.coords.longitude); */
                     },
                     (error) => {
                         console.log(error.message);
@@ -16,6 +19,22 @@ export default {
                 console.log("Error! Your browser does not support geolocation API");
             }
         },
+        getAdressForm(lat, long) {
+            const apiKey = 'myKey'; // Sostituisci con la tua chiave API
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apiKey}`;
+
+            axios.get(url)
+                .then(response => {
+                    if (response.data.error_message) {
+                        console.log(response.data.error_message);
+                    } else {
+                        console.log(response.data.results[0].formatted_address);
+                    }
+                })
+                .catch(error => {
+                    console.log(error.message);
+                });
+        }
     },
 };
 </script>
@@ -30,8 +49,9 @@ export default {
                     <div class="input-group flex-nowrap">
                         <input type="text" class="form-control" placeholder="Enter your address" aria-label="Username"
                             aria-describedby="addon-wrapping" />
-                        <button class="input-group-text bg-warning text-white"
-                            @click.prevent="locatorButtonPressed">🔎</button>
+                        <button class="input-group-text bg-warning text-white" @click.prevent="locatorButtonPressed">
+                            🔎
+                        </button>
                     </div>
                 </form>
             </div>
